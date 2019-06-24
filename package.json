@@ -1,0 +1,27 @@
+{
+  "name": "hackweek",
+  "version": "0.0.0",
+  "description": "2019 Discord Hack Week Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/typicalbot/hackweek.git"
+  },
+  "keywords": [
+    "discord",
+    "discordapp"
+  ],
+  "authors": [
+    "Nicholas Sylke <hello@nsylke.me>",
+    "Bryan Pikaard <bryan.pikaardjr@outlook.com>",
+    "Tyler Richards <rocket0191@gmail.com>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/typicalbot/hackweek/issues"
+  },
+  "homepage": "https://github.com/typicalbot/hackweek#readme"
+}

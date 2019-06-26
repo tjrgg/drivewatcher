@@ -18,25 +18,10 @@ class Bot extends Client {
         this.commands = new Collection();
     }
 
-    loadCommand(cmdPath, cmdName) {
-        try {
-            const cmd = new (require(`${cmdPath}${path.sep}${cmdName}.js`))(this);
-            if (cmd.init) cmd.init(this);
-            this.commands.set(cmdName, cmd);
-            return false;
-        }
-        catch (e) {
-            return `Failed to load ${cmdName} command: ${e}`;
-        }
-    }
-
-    unloadCommand(cmdPath, cmdName) {
-        if (this.commands.has(cmdName)) {
-            this.commands.delete(cmdName);
-            delete require.cache[require.resolve(`${cmdPath}${path.sep}${cmdName}.js`)];
-            return false;
-        }
-        else return `${cmdName} command not loaded.`;
+    async loadCommand(cmdPath, cmdName) {
+        const cmd = new (require(`${cmdPath}${path.sep}${cmdName}.js`))(this);
+        if (cmd.init) cmd.init(this);
+        this.commands.set(cmdName, cmd);
     }
 }
 
@@ -50,8 +35,7 @@ const init = async () => {
     klaw("./src/commands").on("data", (item) => {
       const cmdFile = path.parse(item.path);
       if (!cmdFile.ext || cmdFile.ext !== ".js") return;
-      const response = client.loadCommand(cmdFile.dir, `${cmdFile.name}`);
-      if (response) console.error(response);
+      client.loadCommand(cmdFile.dir, `${cmdFile.name}`).catch(e => console.error(e));
     });
 
     const eventFiles = await readdir("./src/events/");
@@ -64,8 +48,7 @@ const init = async () => {
 
     const routeFiles = await readdir("./src/routes/");
     routeFiles.forEach(file => {
-      const routeName = file.split(".")[0];
-      const route = (require(`../src/routes/${file}`))(server);
+        require(`../src/routes/${file}`)(server);
     });
 
     client.login(client.config.token);

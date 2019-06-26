@@ -4,12 +4,7 @@ module.exports = class {
     }
 
     async run(message, args) {
-        try {
-            const msg = await message.channel.send("Pong!");
-            msg.edit(`Pong! (Roundtrip: ${msg.createdTimestamp - message.createdTimestamp}ms; Heartbeat: ${Math.round(this.client.ping)}ms)`);
-        }
-        catch (e) {
-            console.error(e);
-        }
+        const msg = await message.channel.send("Pong!");
+        msg.edit(`Pong! (Roundtrip: ${msg.createdTimestamp - message.createdTimestamp}ms; Heartbeat: ${Math.round(this.client.ping)}ms)`);
     }
 }

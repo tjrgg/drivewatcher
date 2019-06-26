@@ -1,6 +1,5 @@
-const config = {
+module.exports = {
     "prefix": "",
-    "token": "" // https://discordapp.com/developers/applications
+    "discordToken": "", // https://discordapp.com/developers/applications
+    "googleAuthToken": ""
 }
-
-module.exports = config;

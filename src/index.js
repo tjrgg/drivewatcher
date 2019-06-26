@@ -1,8 +1,9 @@
 const { Client, Collection } = require("discord.js");
 
 const { promisify } = require("util");
-const readdir = promisify(require("fs").readdir);
-const path = require("path");
+let { readdir, readdirSync } = require("fs");
+readdir = promisify(readdir);
+const { sep, parse } = require("path");
 
 const klaw = require("klaw");
 
@@ -19,7 +20,7 @@ class Bot extends Client {
     }
 
     async loadCommand(cmdPath, cmdName) {
-        const cmd = new (require(`${cmdPath}${path.sep}${cmdName}.js`))(this);
+        const cmd = new (require(`${cmdPath}${sep}${cmdName}.js`))(this);
         if (cmd.init) cmd.init(this);
         this.commands.set(cmdName, cmd);
     }
@@ -33,7 +34,7 @@ const serverPort = client.config.port || 3000;
 
 const init = async () => {
     klaw("./src/commands").on("data", (item) => {
-      const cmdFile = path.parse(item.path);
+      const cmdFile = parse(item.path);
       if (!cmdFile.ext || cmdFile.ext !== ".js") return;
       client.loadCommand(cmdFile.dir, `${cmdFile.name}`).catch(e => console.error(e));
     });
@@ -46,12 +47,9 @@ const init = async () => {
       delete require.cache[require.resolve(`../src/events/${file}`)];
     });
 
-    const routeFiles = await readdir("./src/routes/");
-    routeFiles.forEach(file => {
-        require(`../src/routes/${file}`)(server);
-    });
+    readdirSync("./src/routes/").forEach(route => server.use(require(`./routes/${route}`)));
 
-    client.login(client.config.token);
+    client.login(client.config.discordToken);
     server.listen(serverPort, function () {
         console.log(`Server running on port ${serverPort}.`);
     });

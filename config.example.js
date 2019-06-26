@@ -1,5 +1,8 @@
 module.exports = {
     "prefix": "",
     "discordToken": "", // https://discordapp.com/developers/applications
-    "googleAuthToken": ""
+    "googleAuthToken": "",
+    "googleClientId": "",
+    "googleClientSecret": "",
+    "googleCallbackUrl": ""
 }

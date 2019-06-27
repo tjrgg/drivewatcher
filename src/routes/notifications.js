@@ -35,5 +35,8 @@ router.post("/notifications", (req, res) => {
     } else if (XGoogResourceState == "untrash") {
         // A resource has been removed from the trash.
 
+    } else {
+        // Unknown state
+        console.log(`An unknown state occurred: ${XGoogResourceState}`);
     }
-})
+});

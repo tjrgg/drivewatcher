@@ -1,5 +1,3 @@
-const config = require("../config.js");
-
 const Client = require("./structures/Client.js");
 
 const { parse } = require("path");
@@ -11,6 +9,7 @@ const klaw = require("klaw");
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const session = require("express-session");
 
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
@@ -18,8 +17,24 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const client = new Client();
 
 const server = new express();
-server.use(bodyParser.json());
 const serverPort = client.config.port || 3000;
+
+passport.use(new GoogleStrategy({
+    clientID: client.config.googleClientId,
+    clientSecret: client.config.googleClientSecret,
+    callbackURL: client.config.googleCallbackUrl,
+    accessType: "offline",
+    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+}, (accessToken, refreshToken, profile, cb) => cb(null, profile)));
+
+passport.serializeUser((user, cb) => cb(null, user));
+passport.deserializeUser((obj, cb) => cb(null, obj));
+
+server.use(bodyParser.json());
+server.use(bodyParser.urlencoded({extended: true}));
+server.use(session({secret: 'hackweek', resave: true, saveUninitialized: true}));
+server.use(passport.initialize());
+server.use(passport.session());
 
 const init = async () => {
     klaw("./src/commands").on("data", (item) => {
@@ -36,15 +51,6 @@ const init = async () => {
       delete require.cache[require.resolve(`../src/events/${file}`)];
     });
 
-    passport.use(new GoogleStrategy({
-        clientID: config.googleClientId,
-        clientSecret: config.googleClientSecret,
-        callbackURL: config.googleCallbackUrl,
-        accessType: "offline",
-        userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
-    }, (accessToken, refreshToken, profile, cb) => cb(null, extractProfile(profile))));
-    passport.serializeUser((user, cb) => cb(null, user));
-    passport.deserializeUser((obj, cb) => cb(null, obj));
     readdirSync("./src/routes/").forEach(route => server.use(require(`./routes/${route}`)));
 
     client.login(client.config.discordToken);

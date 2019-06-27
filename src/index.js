@@ -1,8 +1,8 @@
 const config = require("../config.js");
 
-const { Client, Collection } = require("discord.js");
+const Client = require("./structures/Client.js");
 
-const { parse, sep } = require("path");
+const { parse } = require("path");
 const { promisify } = require("util");
 let { readdir, readdirSync } = require("fs");
 readdir = promisify(readdir);
@@ -15,23 +15,7 @@ const bodyParser = require("body-parser");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
-class Bot extends Client {
-    constructor(options) {
-        super(options);
-
-        this.config = config;
-
-        this.commands = new Collection();
-    }
-
-    async loadCommand(cmdPath, cmdName) {
-        const cmd = new (require(`${cmdPath}${sep}${cmdName}.js`))(this);
-        if (cmd.init) cmd.init(this);
-        this.commands.set(cmdName, cmd);
-    }
-}
-
-const client = new Bot();
+const client = new Client();
 
 const server = new express();
 server.use(bodyParser.json());
